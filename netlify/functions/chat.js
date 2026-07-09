@@ -1,13 +1,78 @@
-module.exports = async (req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+const https = require('https');
 
-    if (req.method === 'OPTIONS') return res.status(200).end();
+function postRequest(url, body) {
+    return new Promise((resolve, reject) => {
+        const u = new URL(url);
+        const options = {
+            hostname: u.hostname,
+            path: u.pathname + u.search,
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Content-Length': Buffer.byteLength(body)
+            }
+        };
+
+        const req = https.request(options, (res) => {
+            let data = '';
+            res.on('data', (chunk) => {
+                data += chunk;
+            });
+            res.on('end', () => {
+                resolve({
+                    statusCode: res.statusCode,
+                    body: data
+                });
+            });
+        });
+
+        req.on('error', (e) => {
+            reject(e);
+        });
+
+        req.write(body);
+        req.end();
+    });
+}
+
+exports.handler = async function (event, context) {
+    // Handle CORS Preflight
+    if (event.httpMethod === 'OPTIONS') {
+        return {
+            statusCode: 200,
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+                'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+            },
+            body: '',
+        };
+    }
+
+    if (event.httpMethod !== 'POST') {
+        return {
+            statusCode: 405,
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+            },
+            body: 'Method Not Allowed',
+        };
+    }
 
     try {
-        const { prompt, history = [] } = req.body;
+        const { prompt, history = [] } = JSON.parse(event.body || '{}');
         const API_KEY = process.env.GEMINI_API_KEY;
+
+        if (!API_KEY) {
+            return {
+                statusCode: 500,
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ reply: "API Key is missing. Please add the GEMINI_API_KEY environment variable in Netlify's Site settings (under Site configuration -> Environment variables)." }),
+            };
+        }
 
         const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${API_KEY}`;
 
@@ -30,18 +95,43 @@ module.exports = async (req, res) => {
             parts: [{ text: `${systemInstruction}\n\nUser: ${prompt}` }]
         });
 
-        const response = await fetch(API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ contents })
-        });
+        const reqBody = JSON.stringify({ contents });
+        const apiResponse = await postRequest(API_URL, reqBody);
+        
+        const data = JSON.parse(apiResponse.body);
+        
+        if (data.error) {
+            console.error("Gemini API Error:", data.error);
+            return {
+                statusCode: 500,
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ reply: "The cosmic frequency is distorted. Please verify your Gemini API key in Netlify settings." }),
+            };
+        }
 
-        const data = await response.json();
         const aiReply = data.candidates[0].content.parts[0].text;
 
-        return res.status(200).json({ reply: aiReply });
+        return {
+            statusCode: 200,
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ reply: aiReply }),
+        };
 
     } catch (error) {
-        return res.status(500).json({ reply: "Connection dropped in the nebula. Try again?" });
+        console.error("Handler Error:", error);
+        return {
+            statusCode: 500,
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ reply: "Connection dropped in the nebula. Try again?" }),
+        };
     }
 };
