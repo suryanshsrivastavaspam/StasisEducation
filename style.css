@@ -1,0 +1,199 @@
+:root {
+    --surya: #ff4d00;
+    --space-blue: #00d4ff;
+    --space-green: #00ff88;
+    --neon-green: #39ff14; /* Pure Neon Green */
+    --bg-black: #010204;
+}
+
+* { box-sizing: border-box; }
+
+body, html {
+    margin: 0; padding: 0;
+    width: 100vw; height: 100vh;
+    background-color: var(--bg-black);
+    font-family: 'Outfit', sans-serif;
+    color: white;
+    overflow: hidden;
+}
+
+/* --- SPACE ENGINE --- */
+.space-engine {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 1; background: radial-gradient(circle at center, #050a14 0%, #010204 100%);
+}
+
+.star-field {
+    position: absolute; width: 100%; height: 100%;
+    background-image: 
+        radial-gradient(1.5px 1.5px at 25px 35px, #fff, transparent),
+        radial-gradient(2px 2px at 150px 200px, #fff, transparent),
+        radial-gradient(1px 1px at 300px 450px, var(--space-blue), transparent),
+        radial-gradient(1px 1px at 800px 600px, var(--space-green), transparent);
+    background-size: 550px 550px;
+    animation: driftStars 120s linear infinite;
+}
+
+.nebula {
+    position: absolute; width: 80%; height: 80%;
+    filter: blur(120px); opacity: 0.2;
+    animation: nebulaMove 20s infinite alternate;
+}
+.nebula-blue { top: 0; left: 0; background: var(--space-blue); }
+.nebula-green { bottom: 0; right: 0; background: var(--space-green); }
+
+.shooting-star {
+    position: absolute; top: 20%; left: 100%; width: 150px; height: 2px;
+    background: linear-gradient(90deg, white, transparent);
+    transform: rotate(-35deg);
+    animation: shoot 10s infinite;
+}
+
+/* --- UI LAYER --- */
+.app-container {
+    position: relative; z-index: 10;
+    display: flex; flex-direction: column;
+    width: 100vw; height: 100vh;
+    background: transparent;
+}
+
+header {
+    padding: 10px 50px;
+    display: flex; justify-content: space-between; align-items: center;
+    background: transparent;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    backdrop-filter: blur(8px);
+}
+
+.brand { font-size: 1.5rem; font-weight: 900; letter-spacing: 2px; margin: 0; }
+.brand span { color: var(--surya); text-shadow: 0 0 10px var(--surya); }
+
+.logo-underline {
+    width: 100%; height: 2px;
+    background: var(--surya); box-shadow: 0 0 10px var(--surya);
+}
+
+/* GREEN ACTIVE STATUS */
+.status-chip {
+    font-size: 0.7rem; 
+    color: var(--neon-green); 
+    font-weight: 900;
+    border: 1px solid rgba(57, 255, 20, 0.4);
+    background: rgba(57, 255, 20, 0.1);
+    padding: 5px 14px; 
+    border-radius: 50px; 
+    letter-spacing: 1.5px;
+    box-shadow: 0 0 10px rgba(57, 255, 20, 0.2);
+}
+
+/* --- CHAT AREA --- */
+#chat-viewport {
+    flex: 1; overflow-y: auto;
+    padding: 30px 20%;
+    display: flex; flex-direction: column; gap: 18px;
+    background: transparent;
+}
+
+.msg {
+    max-width: 75%; padding: 16px 22px; border-radius: 22px;
+    font-size: 1rem; line-height: 1.6; position: relative;
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255,255,255,0.08);
+}
+
+.user-msg {
+    align-self: flex-end; 
+    background: linear-gradient(135deg, var(--surya), #b33600); 
+    color: white; border-bottom-right-radius: 2px;
+}
+
+.ai-msg {
+    align-self: flex-start; 
+    background: rgba(255, 255, 255, 0.04); 
+    border-bottom-left-radius: 2px;
+}
+
+/* LEFT EDIT BUTTON */
+.edit-btn {
+    position: absolute; left: -45px; top: 50%; transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white; width: 32px; height: 32px; border-radius: 50%;
+    cursor: pointer; opacity: 0; transition: 0.3s;
+}
+.user-msg:hover .edit-btn { opacity: 1; left: -38px; border-color: var(--surya); }
+
+/* --- TRANSPARENT SEARCH SECTION --- */
+.input-section {
+    padding: 20px 20%;
+    background: transparent;
+    backdrop-filter: blur(10px);
+}
+
+.input-wrapper {
+    display: flex; gap: 12px; padding: 6px;
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 22px; 
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    transition: 0.3s ease;
+}
+
+input {
+    flex: 1; background: transparent; border: none;
+    color: white; padding: 12px 18px; font-size: 1rem; outline: none;
+}
+
+button#send-trigger {
+    background: var(--surya); color: white; border: none;
+    min-width: 80px; padding: 0 25px; border-radius: 16px; 
+    font-weight: 900; cursor: pointer; transition: 0.3s;
+}
+
+/* APPLE STORE DOWNLOAD ANIMATION */
+button#send-trigger.loading {
+    background: rgba(255,255,255,0.1) !important;
+    border: 1px solid rgba(255,255,255,0.2);
+    color: transparent !important;
+    min-width: 40px;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.apple-loader {
+    width: 24px;
+    height: 24px;
+    border: 2px solid var(--surya);
+    border-top: 2px solid transparent;
+    border-radius: 50%;
+    position: relative;
+    animation: spin 1s linear infinite;
+}
+
+/* The square inside the circle */
+.apple-loader::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 8px; height: 8px;
+    background: var(--surya);
+    transform: translate(-50%, -50%);
+    border-radius: 1px;
+}
+
+/* --- ANIMATIONS --- */
+@keyframes spin { 100% { transform: rotate(360deg); } }
+@keyframes driftStars { from { transform: translateY(0); } to { transform: translateY(-550px); } }
+@keyframes shoot {
+    0% { transform: translate(0, 0) rotate(-35deg); opacity: 0; }
+    5% { opacity: 1; }
+    15% { transform: translate(-100vw, 80vh) rotate(-35deg); opacity: 0; }
+    100% { opacity: 0; }
+}
+
+#chat-viewport::-webkit-scrollbar { width: 4px; }
+#chat-viewport::-webkit-scrollbar-thumb { background: var(--surya); border-radius: 10px; }

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stasis Chatbot | Antariksh</title>
+    <script src="https://cdn.jsdelivr.net/npm/markdown-it@14.1.0/dist/markdown-it.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;600;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="space-engine">
+        <div class="star-field"></div>
+        <div class="nebula nebula-blue"></div>
+        <div class="nebula nebula-green"></div>
+        <div class="shooting-star"></div>
+    </div>
+
+    <div class="app-container">
+        <header>
+            <div class="logo-group">
+                <h1 class="brand">STASIS <span>CHATBOT</span></h1>
+                <div class="logo-underline"></div>
+            </div>
+            <!-- Neon Green Status -->
+            <div class="status-chip">● ACTIVE</div>
+        </header>
+
+        <div id="chat-viewport">
+            <div class="msg ai-msg">
+                Hey! I'm Stasis Chatbot. Whats on your mind Friend?..
+            </div>
+        </div>
+
+        <div class="input-section">
+            <div class="input-wrapper">
+                <input type="text" id="query-input" placeholder="Ask Stasis Chatbot..." autofocus>
+                <button id="send-trigger">RUN</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
