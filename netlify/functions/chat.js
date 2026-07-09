@@ -108,7 +108,7 @@ exports.handler = async function (event, context) {
                     'Access-Control-Allow-Origin': '*',
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ reply: "The cosmic frequency is distorted. Please verify your Gemini API key in Netlify settings." }),
+                body: JSON.stringify({ reply: `The cosmic frequency is distorted. Error details: ${data.error.message || "Unknown API Error"}` }),
             };
         }
 
